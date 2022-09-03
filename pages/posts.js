@@ -12,7 +12,8 @@ export const Posts = ({ posts }) => {
   const [total, setTotal] = useState(0);
   const [page, setPage] = useState(1);
   const [loading, setLoading] = useState(false);
-
+  const[Likes,setLikes]=useState("");
+  const[postIdd,setpostId]=useState("");
   useEffect(() => {
     getTotal();
   }, []);
@@ -32,8 +33,39 @@ export const Posts = ({ posts }) => {
     }
   };
 
+  const UpdateLike = async (ee) => {
+    try {
+      // setpostId(ee);
+      setLikes("");
+       const postId=ee;
+     console.log(postId)
+      const { data } = await axios.post("/likes",{postId});
+      console.log("total", data);
+      setLikes(data.likes);
+      LikeHelper();
+      
+    } catch (err) {
+      console.log(err);
+    }
+  };
+
+  const DisLike = async (ee) => {
+    try {
+      const postId=ee;
+     console.log(postId)
+      const { data } = await axios.post("/disLikes",{postId});
+      console.log("total", data);
+      setLikes(data.likes);
+      LikeHelper();
+    } catch (err) {
+      console.log(err);
+    }
+  };
+
+
   const loadMore = async () => {
     try {
+     
       setLoading(true);
       const { data } = await axios.get(`/posts/${page}`);
       setAllPosts([...allPosts, ...data]);
@@ -43,6 +75,19 @@ export const Posts = ({ posts }) => {
       setLoading(false);
     }
   };
+  const LikeHelper = async () => {
+    try {
+     
+      setLoading(true);
+      const { data } = await axios.get(`/posts/${page}`);
+      setAllPosts([...data]);
+      setLoading(false);
+    } catch (err) {
+      console.log(err);
+      setLoading(false);
+    }
+  };
+
 
   return (
     <>
@@ -53,7 +98,7 @@ export const Posts = ({ posts }) => {
       <Row gutter={12}>
         {allPosts.map((post) => (
           <Col xs={24} xl={8} style={{ marginTop: 5, marginBottom: 5 }}>
-            <Link href={`/post/${post.slug}`}>
+            {/* <Link href={`/post/${post.slug}`}> */}
               <a>
                 <Card
                   hoverable
@@ -66,10 +111,21 @@ export const Posts = ({ posts }) => {
                     />
                   }
                 >
-                  <Meta title={post.title} />
+                   <p>{post.likes}</p>
+                    {/* if(page==1){
+                      <button onClick={()=> UpdateLike(post._id)}>Likes</button>
+                    }
+                    else{
+                      <button onClick={()=> DisLike(post._id)}>DisLikes</button>
+                    } */}
+                     <button onClick={()=> UpdateLike(post._id)}>Likes</button>
+                     <button onClick={()=> DisLike(post._id)}>DisLikes</button>
                 </Card>
               </a>
-            </Link>
+        
+        
+                     {/* <button onClick={Dislike}>Dislikes</button> */}
+                  <Meta title={post.title} />
           </Col>
         ))}
       </Row>
